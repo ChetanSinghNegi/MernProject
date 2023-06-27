@@ -1,40 +1,16 @@
-import React, { useCallback, useReducer } from "react";
-import "./PlaceForm.css";
+import React from "react";
 import {
   VALIDATOR_REQUIRE,
   VALIDATOR_MINLENGTH,
 } from "../../shared/utils/validators";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
+import useForm from "../../shared/hooks/form-hook";
+import "./PlaceForm.css";
 
-const formReducer = (state, action) => {
-  switch (action.type) {
-    case "INPUT_CHANGE":
-      let formIsValid = true;
-      for (const inputId in state.inputs) {
-        if (inputId === action.inputId) {
-          formIsValid = formIsValid && action.isValid;
-        } else {
-          formIsValid = formIsValid && state.inputs[inputId].isValid;
-        }
-      }
-      return {
-        ...state,
-        inputs: {
-          ...state.inputs,
-          [action.inputId]: { value: action.value, isValid: action.isValid },
-        },
-        isValid: formIsValid,
-      };
-    default:
-      return state;
-  }
-};
 const NewPlace = () => {
-  const [formState, dispatch] = useReducer(formReducer, {
-    //for overall form validity
-    inputs: {
-      //contains value of all input fields
+  const [formState, inputHandler] = useForm(
+    {
       title: {
         value: "",
         isValid: false,
@@ -48,23 +24,15 @@ const NewPlace = () => {
         isValid: false,
       },
     },
-    isValid: false, //overall Form validity
-  });
-  const inputHandler = useCallback((id, value, isValid) => {
-    dispatch({
-      type: "INPUT_CHANGE",
-      value: value,
-      isValid: isValid,
-      inputId: id,
-    });
-  }, []);
+    false
+  );
 
-  const onSubmitHandler = (event) => {
+  const placeSubmitHandler = (event) => {
     event.preventDefault();
     console.log("inputs value =>", formState.inputs);
   };
   return (
-    <form className="place-form" onSubmit={onSubmitHandler}>
+    <form className="place-form" onSubmit={placeSubmitHandler}>
       <Input
         id="title"
         element="input"
